@@ -69,19 +69,20 @@ public class Stub {
 							.build();
 					MongoClient mongoClient = MongoClients.create(settings);
 					MongoDatabase database = mongoClient.getDatabase(prop.getProperty("db.name"));
-					MongoCollection<Document> collection = database.getCollection("test");
+					MongoCollection<Document> collection = database.getCollection("Movies");
 					
 					String tillb = t.getText();
 					
-					Bson filter = Filters.in("amenities", tillb);
+					Bson filter = Filters.in("genres", tillb);
 					
 					AggregateIterable<Document> myDocs = collection.aggregate(Arrays.asList(
 							Aggregates.project(
-										Projections.include("name", "address.country", "amenities")
+										Projections.include("title", "year", "genres")
 									),
 							Aggregates.match(filter),
-							Aggregates.limit(3),
-							Aggregates.sort(Sorts.descending("name"))
+							Aggregates.limit(10),
+							Aggregates.sort(Sorts.descending("title"))
+							
 								
 							));
 					
@@ -89,23 +90,33 @@ public class Stub {
 					
 					area.setText("");
 					
+					if (!iterator.hasNext()) {
+						area.setText("Ingen film matchade kategorin");
+						
+					} else {
+					
 					while(iterator.hasNext()) {
 						
+
 						Document myDoc = iterator.next();
-						area.append("Objektets namn: " + myDoc.getString("name") + "\n");
-						area.append("Land: " + ((Document) myDoc.get("address")).getString("country") + "\n");
+						area.append("Filmens namn: " + myDoc.getString("title") + "\n");
+						area.append("Filmens gjordes år: " +  myDoc.get("year") +"\n");
 						
-						List <String> tilbhlista = (List <String>) myDoc.get("amenities");
-						area.append("Tillbehör: ");
+						List <String> list = (List <String>) myDoc.get("genres");
+						List <String> tilbhlista = list;
+						
 						
 						for(String til:tilbhlista) {
 							area.append(til + ", ");
 						}
 						
-						area.append("\n\n ----------------------------- \n");
+						area.append("\n\n -----------------------------\n "); 
 						
 						
 					}
+					}
+				
+				
 					
 					
 					
@@ -122,22 +133,23 @@ public class Stub {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-			}
+				
+				}}
+		}
 			
 			
-		});
+			);
 		
 		
 		f.add(area);
 		f.add(t);
 		f.add(b);
-		f.setVisible(true);
+		f.setVisible(true); } }
 		
 		
 		
 		
 		
-	}
-
-}
+	
+		
+		
